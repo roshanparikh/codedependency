@@ -19,15 +19,17 @@ class HospitalMerge():
             "d_labitems.csv"
             ]
     
-    def call(self, save):
+    def call(self, save, subset_frac):
         '''
         Creates a csv file that merges all of the hospital demo data into two csv files.
         @params:
             save (bool): True if you want to save a csv file of the merged data without any dimension data; False otherwise.
+            subset_frac (flt): Takes a subset_frac proportion of the data
         @returns:
             df: pandas dataframe with hospital data merged on subject_id.
         '''
         df = pd.read_csv(self.filepath + "patients.csv")
+        df = df.sample(frac=subset_frac, random_state=42)
         
         for table in self.tables:
             if table != 'patients.csv':
