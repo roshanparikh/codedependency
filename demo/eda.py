@@ -61,8 +61,33 @@ def filter_for_drugs(icd, df):
 
     return df_filt
 
-df_arthero = filter_for_drugs(icd='I2510', df=df)
-df_ht = filter_for_drugs(icd='E039', df=df)
+# df_arthero = filter_for_drugs(icd='I2510', df=df)
+# df_ht = filter_for_drugs(icd='E039', df=df)
 
 # Next step: look at ICD-10s by outcome (like fraction of ppl who died)
+df_adm = pd.read_csv(hosp_filepath + "admissions.csv.gz")
+df_adm = df_adm.drop("subject_id", axis=1)
+df_merged = pd.merge(df_adm,df, on="hadm_id", how="left")
+
+prop_nan = (
+    df_merged['deathtime'].isna()    # True/False per row
+    .groupby(df_merged['icd_code'])  # group by icd_code
+    .mean()                          # mean of True=1 gives proportion of NaNs
+    .sort_values(ascending=False)    # sort descending
+)
+
+summary = (
+    df_merged
+    .groupby("icd_code")["deathtime"]
+    .agg(
+        prop_nan=lambda x: x.isna().mean(),   # proportion of NaNs
+        count="size"                          # total number of rows per code
+    )
+    .sort_values("prop_nan", ascending=False)
+)
+
+filtered = summary[summary["prop_nan"] <0.9]
+filtered = filtered.sort_values("count", ascending=False)
+
+print(filtered)
 
