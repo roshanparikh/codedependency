@@ -37,36 +37,36 @@ names_cont_feats = ['anchor_age', 'los',
 random_state = 42; max_iter = 1000000
 
 models_and_params = {
-    'Ridge': {'model': LogisticRegression(penalty = 'l2', random_state=random_state, max_iter=max_iter),
-              'params': {'logisticregression__C': np.logspace(-8, 3, 12),
-                         'logisticregression__class_weight': ['balanced', None]}
+    'Ridge': {'model': LogisticRegression(penalty = 'l2', random_state=random_state, max_iter=max_iter, verbose=1),
+              'params': {'model__C': np.logspace(-8, 3, 12),
+                         'model__class_weight': ['balanced', None]}
     },
     'KNN': {'model': KNeighborsClassifier(),
             'params': {'model__n_neighbors': [3, 5, 7, 10, 15, 30, 50, 70, 100],
                        'model__weights': ['uniform', 'distance'],
                        'model__p': [1,2]} #1 is Manhattan distance, 2 is Euclidean distance 
     },
-    'SVC Linear': {'model': SVC(kernel = 'linear', random_state=random_state),
+    'SVC Linear': {'model': SVC(kernel = 'linear', random_state=random_state, verbose=True),
                    'params': {'model__C': np.logspace(-5, 3, 9),
                               'model__class_weight': ['balanced', None]}
     },
-    'SVC RBF': {'model': SVC(kernel = 'rbf', random_state=random_state),
+    'SVC RBF': {'model': SVC(kernel = 'rbf', random_state=random_state, verbose=True),
                 'params': {'model__C': np.logspace(-5, 3, 9),
                            'model__class_weight': ['balanced', None]}
     }, 
-    'SVC Poly': {'model': SVC(kernel='poly', random_state=random_state),
+    'SVC Poly': {'model': SVC(kernel='poly', random_state=random_state, verbose=True),
                  'params': {'model__C': np.logspace(-4, 3, 8),
                             'model__degree': [2, 3],                     
                             'model__gamma': ['scale', 'auto', 1e-3, 1e-2, 1e-1],
                             'model__coef0': [0.0, 0.1, 1.0, 10.0],      
                             'model__class_weight': ['balanced', None]}
     },
-    'XGB': {'model': XGBClassifier(learning_rate = 0.03, n_estimators = 1000, missing=np.nan, subsample=0.66),
+    'XGB': {'model': XGBClassifier(learning_rate = 0.03, n_estimators = 1000, missing=np.nan, subsample=0.66, verbosity=1),
             'params': {'model__max_depth': [1, 3, 10, 30, 100],  # Depth of the tree
                        'model__colsample_bytree': [0.1, 0.25, 0.5, 0.75, 1.0],  # Fraction of features used for fitting trees
                        'model__scale_pos_weight': [0.025, 0.05, 0.1, 0.25, 0.5, 1, 5, 10]}
     },
-    'MLP': {'model': MLPClassifier(random_state=random_state, max_iter=300, early_stopping=True, n_iter_no_change=10,),
+    'MLP': {'model': MLPClassifier(random_state=random_state, max_iter=300, early_stopping=True, n_iter_no_change=10, verbose=True),
             'params': {'model__hidden_layer_sizes': [(64,), (128,), (128, 64), (256, 128)],
                        'model__activation': ['relu', 'tanh'],
                        'model__alpha': np.logspace(-6, -2, 5),        
@@ -75,8 +75,8 @@ models_and_params = {
                        'model__solver': ['adam'],}
     }
 }
-
-model_list = ['XGB', 'KNN', 'Ridge', 'SVC Linear', 'SVC RBF', 'SVC Poly', 'MLP']
+model_list = ['Ridge']
+#model_list = ['Ridge', 'XGB', 'KNN', 'SVC Linear', 'SVC RBF', 'SVC Poly', 'MLP']
 
 ml = MLPipeline(X=X, y=y, std_ftrs=names_cont_feats, onehot_ftrs=names_cat_feats)
 model_results = ml(model_list=model_list, models_and_params=models_and_params)

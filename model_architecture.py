@@ -107,7 +107,7 @@ class MLPipeline:
         # CV and prepro
         print(f"\n>>>Running {ML_algo}")
         grid = GridSearchCV(pipe, param_grid=param_grid,scoring = make_scorer(f1_score),
-                                cv=None, return_train_score = True, n_jobs=1, verbose=False)
+                                cv=None, return_train_score = True, n_jobs=1, verbose=1)
 
         # Sanity check
         X_prep = self.preprocessor.fit_transform(X_other)
