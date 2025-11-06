@@ -4,9 +4,13 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.svm import SVC
 from sklearn.neural_network import MLPClassifier
+import warnings
+warnings.filterwarnings("error", category=RuntimeWarning)
+from sklearn.exceptions import ConvergenceWarning
+warnings.filterwarnings("ignore", category=ConvergenceWarning)
 
+import xgboost
 from xgboost import XGBClassifier
-import xgboost as xgb
 
 from model_architecture import MLPipeline
 
@@ -23,8 +27,8 @@ names_cont_feats = ['anchor_age', 'los',
        'Absolute Basophil Count', 'Absolute Eosinophil Count',
        'Absolute Lymphocyte Count', 'Absolute Monocyte Count',
        'Absolute Neutrophil Count', 'Anion Gap', 'Base Excess', 'Bicarbonate',
-       'Calculated Total CO2', 'Creatinine', 'H', 'Hematocrit', 'Hemoglobin',
-       'I', 'INR(PT)', 'Immature Granulocytes', 'L', 'Lactate', 'PT', 'PTT',
+       'Creatinine', 'H', 'Hemoglobin',
+       'I', 'INR(PT)', 'Immature Granulocytes', 'L', 'Lactate', 'PTT',
        'Platelet Count', 'RDW', 'Red Blood Cells', 'SIRI', 'Urea Nitrogen',
        'pO2']
 
@@ -38,37 +42,37 @@ models_and_params = {
                          'logisticregression__class_weight': ['balanced', None]}
     },
     'KNN': {'model': KNeighborsClassifier(),
-            'params': {'kneighborsclassifier__n_neighbors': [3, 5, 7, 10, 15, 30, 50, 70, 100],
-                       'kneighborsclassifier__weights': ['uniform', 'distance'],
-                       'kneighborsclassifier__p': [1,2]} #1 is Manhattan distance, 2 is Euclidean distance 
+            'params': {'model__n_neighbors': [3, 5, 7, 10, 15, 30, 50, 70, 100],
+                       'model__weights': ['uniform', 'distance'],
+                       'model__p': [1,2]} #1 is Manhattan distance, 2 is Euclidean distance 
     },
     'SVC Linear': {'model': SVC(kernel = 'linear', random_state=random_state),
-                   'params': {'svc__C': np.logspace(-5, 3, 9),
-                              'svc__class_weight': ['balanced', None]}
+                   'params': {'model__C': np.logspace(-5, 3, 9),
+                              'model__class_weight': ['balanced', None]}
     },
     'SVC RBF': {'model': SVC(kernel = 'rbf', random_state=random_state),
-                'params': {'svc__C': np.logspace(-5, 3, 9),
-                           'svc__class_weight': ['balanced', None]}
+                'params': {'model__C': np.logspace(-5, 3, 9),
+                           'model__class_weight': ['balanced', None]}
     }, 
     'SVC Poly': {'model': SVC(kernel='poly', random_state=random_state),
-                 'params': {'svc__C': np.logspace(-4, 3, 8),
-                            'svc__degree': [2, 3],                     
-                            'svc__gamma': ['scale', 'auto', 1e-3, 1e-2, 1e-1],
-                            'svc__coef0': [0.0, 0.1, 1.0, 10.0],      
-                            'svc__class_weight': ['balanced', None]}
+                 'params': {'model__C': np.logspace(-4, 3, 8),
+                            'model__degree': [2, 3],                     
+                            'model__gamma': ['scale', 'auto', 1e-3, 1e-2, 1e-1],
+                            'model__coef0': [0.0, 0.1, 1.0, 10.0],      
+                            'model__class_weight': ['balanced', None]}
     },
     'XGB': {'model': XGBClassifier(learning_rate = 0.03, n_estimators = 1000, missing=np.nan, subsample=0.66),
-            'params': {'xgbclassifier__max_depth': [1, 3, 10, 30, 100],  # Depth of the tree
-                       'xgbclassifier__colsample_bytree': [0.1, 0.25, 0.5, 0.75, 1.0],  # Fraction of features used for fitting trees
-                       'xgbclassifier__scale_pos_weight': [0.025, 0.05, 0.1, 0.25, 0.5, 1, 5, 10]}
+            'params': {'model__max_depth': [1, 3, 10, 30, 100],  # Depth of the tree
+                       'model__colsample_bytree': [0.1, 0.25, 0.5, 0.75, 1.0],  # Fraction of features used for fitting trees
+                       'model__scale_pos_weight': [0.025, 0.05, 0.1, 0.25, 0.5, 1, 5, 10]}
     },
     'MLP': {'model': MLPClassifier(random_state=random_state, max_iter=300, early_stopping=True, n_iter_no_change=10,),
-            'params': {'mlpclassifier__hidden_layer_sizes': [(64,), (128,), (128, 64), (256, 128)],
-                       'mlpclassifier__activation': ['relu', 'tanh'],
-                       'mlpclassifier__alpha': np.logspace(-6, -2, 5),        
-                       'mlpclassifier__learning_rate_init': [1e-4, 3e-4, 1e-3],
-                       'mlpclassifier__batch_size': ['auto', 64, 128],
-                       'mlpclassifier__solver': ['adam'],}
+            'params': {'model__hidden_layer_sizes': [(64,), (128,), (128, 64), (256, 128)],
+                       'model__activation': ['relu', 'tanh'],
+                       'model__alpha': np.logspace(-6, -2, 5),        
+                       'model__learning_rate_init': [1e-4, 3e-4, 1e-3],
+                       'model__batch_size': ['auto', 64, 128],
+                       'model__solver': ['adam'],}
     }
 }
 

@@ -1,6 +1,5 @@
 import pandas as pd
 import numpy as np
-import pickle
 
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
@@ -10,7 +9,11 @@ from sklearn.pipeline import make_pipeline
 from sklearn.metrics import make_scorer, accuracy_score, f1_score, precision_score, recall_score
 from sklearn.experimental import enable_iterative_imputer
 from sklearn.impute import IterativeImputer, SimpleImputer
+from sklearn.ensemble import RandomForestRegressor
 from sklearn.inspection import permutation_importance
+
+import warnings
+warnings.filterwarnings("error", category=RuntimeWarning)
 
 class MLPipeline:
     '''
@@ -38,21 +41,37 @@ class MLPipeline:
         # Standard scaler 
         self.std_transformer = Pipeline(steps=[
             ('scaler', StandardScaler())])
+        
+        # Iterative imputer
+        self.iterative_imputer = IterativeImputer(
+            estimator=RandomForestRegressor(
+                n_estimators=10,         
+                max_depth=5,             
+                random_state=42
+            ),
+            max_iter=10,
+            initial_strategy="median",
+            random_state=42,
+            skip_complete=True          
+        )
 
         # Collect the transformers
-        self.preprocessor = ColumnTransformer(
+        self.preprocessor_xgb = ColumnTransformer(
             transformers=[
                 ('std', self.std_transformer, self.std_ftrs),
                 ('ohot', self.one_hot_transformer, self.onehot_ftrs)
             ]
         )
-        
-        # Pipeline
-        self.clf = Pipeline(steps=[('preprocessor', self.preprocessor)])
-        self.final_scaler = StandardScaler()
 
-        # Iterative imputer
-        self.iterative_imputer = IterativeImputer(max_iter=10, random_state=42)
+        self.preprocessor = ColumnTransformer(
+            transformers=[
+                ('ohot', self.one_hot_transformer, self.onehot_ftrs),
+                ('std', Pipeline(steps=[
+                    ('imputer', self.iterative_imputer),
+                    ('scaler', StandardScaler())
+                ]), self.std_ftrs),
+            ]
+        )
 
     def grid_pipeline(self, ML_algo, param_grid):
         ''' 
@@ -70,19 +89,32 @@ class MLPipeline:
 
         # Baselines
         majority_class = np.bincount(y_other).argmax()
-        y_base = np.full(shape=len(y_other), fill_value=majority_class)
-        base_acc = accuracy_score(y_other, y_base)
-        base_f1  = f1_score(y_other, y_base, zero_division=0)
-
+        y_base = np.full(shape=len(y_test), fill_value=majority_class)
+        base_acc = accuracy_score(y_test, y_base)
+        base_f1  = f1_score(y_test, y_base, zero_division=0)
 
         if ML_algo != 'XGB':
-            pipe = make_pipeline(self.preprocessor, self.iterative_imputer, self.final_scaler, ML_algo)
+            pipe = Pipeline([
+                ('preprocessor', self.preprocessor),
+                ('model', ML_algo)
+            ])
         else:
-            pipe = make_pipeline(self.preprocessor, self.final_scaler, ML_algo)
-
+            pipe = Pipeline([
+                ('preprocessor', self.preprocessor_xgb),
+                ('model', ML_algo)
+            ])
+    
         # CV and prepro
+        print(f"\n>>>Running {ML_algo}")
         grid = GridSearchCV(pipe, param_grid=param_grid,scoring = make_scorer(f1_score),
-                                cv=None, return_train_score = True, n_jobs=-1, verbose=False)
+                                cv=None, return_train_score = True, n_jobs=1, verbose=False)
+
+        # Sanity check
+        X_prep = self.preprocessor.fit_transform(X_other)
+
+        assert not np.isnan(X_prep).any(), "NaNs found after preprocessing!"
+        assert not np.isinf(X_prep).any(), "Infs found after preprocessing!"
+        assert np.isfinite(X_prep).all(), "Non-finite values found!"
 
         grid.fit(X_other, y_other)
         y_pred = grid.best_estimator_.predict(X_test)
@@ -128,17 +160,17 @@ class MLPipeline:
         '''
         model_results = {}
 
-        for model in models:
+        for model in model_list:
             ML_algo = models_and_params[model]['model']
             params = models_and_params[model]['params']
             
-            print(f"Results for {model}:")
             results = self.grid_pipeline(ML_algo=ML_algo, param_grid=params)
             
-            print(f"Accuracy: {results['metrics']['accuracy']}")
-            print(f"Accuracy improvement over baseline: {results['metrics']['rel_impr_acc']}")
-            print(f"F_1 Score: {results['metrics']['f1']}")
-            print(f"F_1 improvement over baseline: {results['metrics']['rel_impr_f1']}]")
+            print(f"Results for {model}:")
+            print(f"Accuracy: {results['metrics']['accuracy']:.4f}")
+            print(f"Accuracy improvement over baseline: {results['metrics']['rel_impr_accuracy']:.2%}")
+            print(f"F1 Score: {results['metrics']['f1']:.4f}")
+            print(f"F1 improvement over baseline: {results['metrics']['rel_impr_f1']:.2%}")
 
             model_results[model] = results
 
