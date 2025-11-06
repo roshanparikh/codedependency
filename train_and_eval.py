@@ -1,0 +1,83 @@
+import pandas as pd
+import numpy as np
+from sklearn.linear_model import LogisticRegression
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.svm import SVC
+from sklearn.neural_network import MLPClassifier
+
+from xgboost import XGBClassifier
+import xgboost as xgb
+
+from model_architecture import MLPipeline
+
+# Getting data
+df = pd.read_csv('../data/90_day_mort.csv')
+y = df.copy()['target']
+X = df.copy().drop(['target'], axis=1)
+
+# Organization
+names_cat_feats = ['admission_type', 'admit_provider_id', 'admission_location',
+       'insurance', 'language', 'marital_status', 'race', 'gender', 'first_careunit', 
+       'last_careunit']
+names_cont_feats = ['anchor_age', 'los',
+       'Absolute Basophil Count', 'Absolute Eosinophil Count',
+       'Absolute Lymphocyte Count', 'Absolute Monocyte Count',
+       'Absolute Neutrophil Count', 'Anion Gap', 'Base Excess', 'Bicarbonate',
+       'Calculated Total CO2', 'Creatinine', 'H', 'Hematocrit', 'Hemoglobin',
+       'I', 'INR(PT)', 'Immature Granulocytes', 'L', 'Lactate', 'PT', 'PTT',
+       'Platelet Count', 'RDW', 'Red Blood Cells', 'SIRI', 'Urea Nitrogen',
+       'pO2']
+
+
+# Parameter grid
+random_state = 42; max_iter = 1000000
+
+models_and_params = {
+    'Ridge': {'model': LogisticRegression(penalty = 'l2', random_state=random_state, max_iter=max_iter),
+              'params': {'logisticregression__C': np.logspace(-8, 3, 12),
+                         'logisticregression__class_weight': ['balanced', None]}
+    },
+    'KNN': {'model': KNeighborsClassifier(),
+            'params': {'kneighborsclassifier__n_neighbors': [3, 5, 7, 10, 15, 30, 50, 70, 100],
+                       'kneighborsclassifier__weights': ['uniform', 'distance'],
+                       'kneighborsclassifier__p': [1,2]} #1 is Manhattan distance, 2 is Euclidean distance 
+    },
+    'SVC Linear': {'model': SVC(kernel = 'linear', random_state=random_state),
+                   'params': {'svc__C': np.logspace(-5, 3, 9),
+                              'svc__class_weight': ['balanced', None]}
+    },
+    'SVC RBF': {'model': SVC(kernel = 'rbf', random_state=random_state),
+                'params': {'svc__C': np.logspace(-5, 3, 9),
+                           'svc__class_weight': ['balanced', None]}
+    }, 
+    'SVC Poly': {'model': SVC(kernel='poly', random_state=random_state),
+                 'params': {'svc__C': np.logspace(-4, 3, 8),
+                            'svc__degree': [2, 3],                     
+                            'svc__gamma': ['scale', 'auto', 1e-3, 1e-2, 1e-1],
+                            'svc__coef0': [0.0, 0.1, 1.0, 10.0],      
+                            'svc__class_weight': ['balanced', None]}
+    },
+    'XGB': {'model': XGBClassifier(learning_rate = 0.03, n_estimators = 1000, missing=np.nan, subsample=0.66),
+            'params': {'xgbclassifier__max_depth': [1, 3, 10, 30, 100],  # Depth of the tree
+                       'xgbclassifier__colsample_bytree': [0.1, 0.25, 0.5, 0.75, 1.0],  # Fraction of features used for fitting trees
+                       'xgbclassifier__scale_pos_weight': [0.025, 0.05, 0.1, 0.25, 0.5, 1, 5, 10]}
+    },
+    'MLP': {'model': MLPClassifier(random_state=random_state, max_iter=300, early_stopping=True, n_iter_no_change=10,),
+            'params': {'mlpclassifier__hidden_layer_sizes': [(64,), (128,), (128, 64), (256, 128)],
+                       'mlpclassifier__activation': ['relu', 'tanh'],
+                       'mlpclassifier__alpha': np.logspace(-6, -2, 5),        
+                       'mlpclassifier__learning_rate_init': [1e-4, 3e-4, 1e-3],
+                       'mlpclassifier__batch_size': ['auto', 64, 128],
+                       'mlpclassifier__solver': ['adam'],}
+    }
+}
+
+model_list = ['XGB', 'KNN', 'Ridge', 'SVC Linear', 'SVC RBF', 'SVC Poly', 'MLP']
+
+ml = MLPipeline(X=X, y=y, std_ftrs=names_cont_feats, onehot_ftrs=names_cat_feats)
+model_results = ml(model_list=model_list, models_and_params=models_and_params)
+
+import pickle
+with open('model_results.pkl', 'wb') as f:
+            pickle.dump(model_results, f)
+
