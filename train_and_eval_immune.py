@@ -73,8 +73,7 @@ models_and_params = {
     }
 }
 
-model_list=['SVC Poly']
-#model_list = ['XGB', 'KNN', 'SVC Linear', 'SVC RBF', 'SVC Poly'] #Ridge and MLP threw a lot of errors
+model_list = ['XGB', 'KNN', 'SVC Linear', 'SVC RBF', 'SVC Poly'] #Ridge and MLP threw a lot of errors
 
 ml = MLPipeline(X=X, y=y, std_ftrs=names_cont_feats, onehot_ftrs=names_cat_feats)
 model_results = ml(model_list=model_list, models_and_params=models_and_params)
