@@ -84,9 +84,9 @@ model_results = ml(model_list=model_list, models_and_params=models_and_params)
 
 import pickle
 if df_90:
-       with open('model_results_90.pkl', 'wb') as f:
+       with open('model_results_immune_90.pkl', 'wb') as f:
               pickle.dump(model_results, f)
 else:
-     with open('model_results_30.pkl', 'wb') as f:
+     with open('model_results_immune_30.pkl', 'wb') as f:
               pickle.dump(model_results, f)
 
