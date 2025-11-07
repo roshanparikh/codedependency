@@ -123,18 +123,11 @@ class MLPipeline:
                                 cv=None, return_train_score = True, n_jobs=-1, verbose=1)
 
         # Sanity checks
-        print("Min/std of std_ftrs columns:")
-        print(self.X[self.std_ftrs].std().sort_values().head())
-
         num_data = X_other[self.std_ftrs]
         assert np.isfinite(num_data.values).any(), "All numeric values are NaN or inf!"
         assert not np.isinf(num_data.values).any(), "Found inf or -inf in numeric features!"
 
         X_prep = preprocessor.fit_transform(X_other)
-
-        X_df = pd.DataFrame(X_prep)
-        print("Top unstable columns:")
-        print(X_df.std().sort_values(ascending=False).head(10))
 
         if is_xgb:
             # XGBoost is fine with NaNs; just make sure no ±inf slipped through.

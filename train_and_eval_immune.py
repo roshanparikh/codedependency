@@ -16,7 +16,11 @@ from xgboost import XGBClassifier
 from model_architecture import MLPipeline
 
 # Getting data
-df = pd.read_csv('../data/90_day_mort.csv')
+df_90 = False
+if df_90:
+       df = pd.read_csv('../data/90_day_mort.csv')
+else:
+       df = pd.read_csv('../data/30_day_mort.csv')
 y = df.copy()['target']
 X = df.copy().drop(['target'], axis=1)
 X = X[['admission_type', 'admit_provider_id', 'admission_location',
@@ -79,6 +83,10 @@ ml = MLPipeline(X=X, y=y, std_ftrs=names_cont_feats, onehot_ftrs=names_cat_feats
 model_results = ml(model_list=model_list, models_and_params=models_and_params)
 
 import pickle
-with open('model_results_immune.pkl', 'wb') as f:
-            pickle.dump(model_results, f)
+if df_90:
+       with open('model_results_90.pkl', 'wb') as f:
+              pickle.dump(model_results, f)
+else:
+     with open('model_results_30.pkl', 'wb') as f:
+              pickle.dump(model_results, f)
 
