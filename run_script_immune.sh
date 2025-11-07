@@ -1,5 +1,3 @@
-#!/bin/bash
-
 #BSUB -P acc_bedsore_images
 #BSUB -q gpu
 #BSUB -gpu num=1

@@ -3,14 +3,16 @@ import numpy as np
 
 from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import StandardScaler, OneHotEncoder
+from sklearn.preprocessing import StandardScaler, OneHotEncoder, RobustScaler
 from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.pipeline import make_pipeline
 from sklearn.metrics import make_scorer, accuracy_score, f1_score, precision_score, recall_score
 from sklearn.experimental import enable_iterative_imputer
 from sklearn.impute import IterativeImputer, SimpleImputer
 from sklearn.ensemble import RandomForestRegressor
+from sklearn.linear_model import BayesianRidge
 from sklearn.inspection import permutation_importance
+from xgboost import XGBClassifier
 
 import warnings
 warnings.filterwarnings("error", category=RuntimeWarning)
@@ -33,52 +35,67 @@ class MLPipeline:
         self.std_ftrs = std_ftrs
         self.onehot_ftrs = onehot_ftrs
 
-        # Categorical scaler
-        self.one_hot_transformer = Pipeline(steps=[
-            ('imputer', SimpleImputer(strategy='constant',fill_value='missing')),
-            ('onehot', OneHotEncoder(sparse_output=False,handle_unknown='ignore'))])
+        self.X[self.std_ftrs] = self.X[self.std_ftrs].replace([np.inf, -np.inf], np.nan)
 
-        # Standard scaler 
-        self.std_transformer = Pipeline(steps=[
-            ('scaler', StandardScaler())])
-        
-        # Iterative imputer
-        self.iterative_imputer = IterativeImputer(
-            estimator=RandomForestRegressor(
-                n_estimators=10,         
-                max_depth=5,             
-                random_state=42
-            ),
-            max_iter=10,
-            initial_strategy="median",
-            random_state=42,
-            skip_complete=True          
-        )
+        self.cat_pipeline = Pipeline([
+            ('imputer', SimpleImputer(strategy='constant', fill_value='missing')),
+            ('onehot', OneHotEncoder(handle_unknown='ignore', sparse_output=False))
+        ])
 
-        # Collect the transformers
-        self.preprocessor_xgb = ColumnTransformer(
-            transformers=[
-                ('std', self.std_transformer, self.std_ftrs),
-                ('ohot', self.one_hot_transformer, self.onehot_ftrs)
-            ]
-        )
+        # self.num_pipeline = Pipeline([
+        #     ('imputer', IterativeImputer(
+        #         estimator=RandomForestRegressor(
+        #             n_estimators=10,
+        #             max_depth=5,
+        #             random_state=42
+        #         ),
+        #         max_iter=50,
+        #         initial_strategy="median",
+        #         skip_complete=True,
+        #         tol=1e-5,
+        #         random_state=42
+        #     )),
+        #     ('scaler', StandardScaler())
+        # ])
 
-        self.preprocessor = ColumnTransformer(
-            transformers=[
-                ('ohot', self.one_hot_transformer, self.onehot_ftrs),
-                ('std', Pipeline(steps=[
-                    ('imputer', self.iterative_imputer),
-                    ('scaler', StandardScaler())
-                ]), self.std_ftrs),
-            ]
-        )
+        # self.num_pipeline = Pipeline([
+        #     ('imputer', IterativeImputer(
+        #         estimator=BayesianRidge(),
+        #         max_iter=50,
+        #         initial_strategy="median",
+        #         skip_complete=True,
+        #         tol=1e-5,
+        #         random_state=42
+        #     )),
+        #     ('scaler', StandardScaler())
+        # ])
 
-    def grid_pipeline(self, ML_algo, param_grid):
+        self.num_pipeline = Pipeline([
+            ('imputer', SimpleImputer(strategy='median')),
+            ('scaler', StandardScaler() )
+        ])
+
+        self.num_pipeline_xgb = Pipeline([
+            ('scaler', StandardScaler())
+        ])
+
+        self.preprocessor = ColumnTransformer([
+            ('num', self.num_pipeline, self.std_ftrs),
+            ('cat', self.cat_pipeline, self.onehot_ftrs),
+        ])
+
+        self.preprocessor_xgb = ColumnTransformer([
+            ('num', self.num_pipeline_xgb, self.std_ftrs),
+            ('cat', self.cat_pipeline, self.onehot_ftrs),
+        ])
+
+    def grid_pipeline(self, ML_algo, param_grid, is_xgb):
         ''' 
         Builds the gridsearch pipeline.
         @params:
             ML_algo (str): Specifies which algorithm will be used
             param_grid (dict): Parameters for GridSearchCV for a single model type
+            is_xgb (bool)
         @returns:
             results (dict): metrics, test sets, and best models per validation fold
         '''
@@ -93,39 +110,53 @@ class MLPipeline:
         base_acc = accuracy_score(y_test, y_base)
         base_f1  = f1_score(y_test, y_base, zero_division=0)
 
-        if ML_algo != 'XGB':
-            pipe = Pipeline([
-                ('preprocessor', self.preprocessor),
-                ('model', ML_algo)
-            ])
-        else:
-            pipe = Pipeline([
-                ('preprocessor', self.preprocessor_xgb),
-                ('model', ML_algo)
-            ])
+        preprocessor = self.preprocessor_xgb if is_xgb else self.preprocessor
+
+        pipe = Pipeline([
+            ('preprocessor', preprocessor),
+            ('model', ML_algo)
+        ])
     
         # CV and prepro
         print(f"\n>>>Running {ML_algo}")
         grid = GridSearchCV(pipe, param_grid=param_grid,scoring = make_scorer(f1_score),
-                                cv=None, return_train_score = True, n_jobs=1, verbose=1)
+                                cv=None, return_train_score = True, n_jobs=-1, verbose=1)
 
-        # Sanity check
-        X_prep = self.preprocessor.fit_transform(X_other)
+        # Sanity checks
+        print("Min/std of std_ftrs columns:")
+        print(self.X[self.std_ftrs].std().sort_values().head())
 
-        assert not np.isnan(X_prep).any(), "NaNs found after preprocessing!"
-        assert not np.isinf(X_prep).any(), "Infs found after preprocessing!"
-        assert np.isfinite(X_prep).all(), "Non-finite values found!"
+        num_data = X_other[self.std_ftrs]
+        assert np.isfinite(num_data.values).any(), "All numeric values are NaN or inf!"
+        assert not np.isinf(num_data.values).any(), "Found inf or -inf in numeric features!"
 
+        X_prep = preprocessor.fit_transform(X_other)
+
+        X_df = pd.DataFrame(X_prep)
+        print("Top unstable columns:")
+        print(X_df.std().sort_values(ascending=False).head(10))
+
+        if is_xgb:
+            # XGBoost is fine with NaNs; just make sure no ±inf slipped through.
+            assert not np.isinf(X_prep).any(), "Inf or -Inf found; convert to NaN."
+        else:
+            # For non-tree models we still require fully finite features
+            assert np.isfinite(X_prep).all(), "Non-finite values found!"
+            assert not np.isnan(X_prep).any(), "NaNs found after preprocessing!"
+
+        # Model training
         grid.fit(X_other, y_other)
+        print("Grid fit complete")
         y_pred = grid.best_estimator_.predict(X_test)
+        print("Predictions made")
 
-        transformer = grid.best_estimator_['columntransformer']
+        transformer = grid.best_estimator_.named_steps['preprocessor']
         X_test_prep = transformer.transform(X_test)
-        X_test_prep_df = pd.DataFrame(X_test_prep, columns = transformer.get_feature_names_out())
+        X_test_prep_df = pd.DataFrame(X_test_prep, columns = transformer.get_feature_names_out())        
 
         mod_acc = accuracy_score(y_test, y_pred)
         mod_f1  = f1_score(y_test, y_pred, zero_division=0)
-
+        print('Making results')
         results = {
             'X_test_raw': X_test,
             'X_test_preprocessed': X_test_prep_df,
@@ -164,13 +195,16 @@ class MLPipeline:
             ML_algo = models_and_params[model]['model']
             params = models_and_params[model]['params']
             
-            results = self.grid_pipeline(ML_algo=ML_algo, param_grid=params)
+            is_xgb = True if model=='XGB' else False
+            results = self.grid_pipeline(ML_algo=ML_algo, param_grid=params, is_xgb=is_xgb)
             
             print(f"Results for {model}:")
             print(f"Accuracy: {results['metrics']['accuracy']:.4f}")
             print(f"Accuracy improvement over baseline: {results['metrics']['rel_impr_accuracy']:.2%}")
             print(f"F1 Score: {results['metrics']['f1']:.4f}")
             print(f"F1 improvement over baseline: {results['metrics']['rel_impr_f1']:.2%}")
+            print(f"Recall: {results['metrics']['recall']}")
+            print(f"Best parameters: {results['best_params']}")
 
             model_results[model] = results
 

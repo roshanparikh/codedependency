@@ -19,23 +19,15 @@ from model_architecture import MLPipeline
 df = pd.read_csv('../data/90_day_mort.csv')
 y = df.copy()['target']
 X = df.copy().drop(['target'], axis=1)
-#X = X[['SIRI', 'Absolute Monocyte Count', 'Absolute Lymphocyte Count', 'Absolute Neutrophil Count']]
+X = X[['admission_type', 'admit_provider_id', 'admission_location',
+       'insurance', 'language', 'marital_status', 'race', 'gender', 'first_careunit', 
+       'last_careunit', 'SIRI', 'Absolute Monocyte Count', 'Absolute Lymphocyte Count', 'Absolute Neutrophil Count']]
 
 # Organization
 names_cat_feats = ['admission_type', 'admit_provider_id', 'admission_location',
        'insurance', 'language', 'marital_status', 'race', 'gender', 'first_careunit', 
        'last_careunit']
-names_cont_feats = ['anchor_age', 'los',
-       'Absolute Basophil Count', 'Absolute Eosinophil Count',
-       'Absolute Lymphocyte Count', 'Absolute Monocyte Count',
-       'Absolute Neutrophil Count', 'Anion Gap', 'Base Excess', 'Bicarbonate',
-       'Creatinine', 'H', 'Hemoglobin',
-       'I', 'INR(PT)', 'Immature Granulocytes', 'L', 'Lactate', 'PTT',
-       'Platelet Count', 'RDW', 'Red Blood Cells', 'SIRI', 'Urea Nitrogen',
-       'pO2']
-
-# names_cat_feats = []
-# names_cont_feats = ['SIRI', 'Absolute Monocyte Count', 'Absolute Lymphocyte Count', 'Absolute Neutrophil Count']
+names_cont_feats = ['SIRI', 'Absolute Monocyte Count', 'Absolute Lymphocyte Count', 'Absolute Neutrophil Count']
 
 
 # Parameter grid
@@ -81,12 +73,13 @@ models_and_params = {
     }
 }
 
-model_list = ['XGB', 'KNN', 'SVC Linear', 'SVC RBF', 'SVC Poly'] #Ridge and MLP threw a lot of errors
+model_list=['SVC Poly']
+#model_list = ['XGB', 'KNN', 'SVC Linear', 'SVC RBF', 'SVC Poly'] #Ridge and MLP threw a lot of errors
 
 ml = MLPipeline(X=X, y=y, std_ftrs=names_cont_feats, onehot_ftrs=names_cat_feats)
 model_results = ml(model_list=model_list, models_and_params=models_and_params)
 
 import pickle
-with open('model_results.pkl', 'wb') as f:
+with open('model_results_immune.pkl', 'wb') as f:
             pickle.dump(model_results, f)
 
