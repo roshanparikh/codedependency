@@ -56,7 +56,7 @@ models_and_params = {
     'SVC Poly': {'model': SVC(kernel='poly', random_state=random_state),
                  'params': {'model__C': np.logspace(-4, 3, 8),
                             'model__degree': [2, 3],                     
-                            'model__gamma': ['scale', 'auto', 1, 10, 100],
+                            'model__gamma': ['scale', 'auto', 0.01, 0.1, 1],
                             'model__coef0': [1.0, 5.0, 10.0, 20.0, 50.0],      
                             'model__class_weight': ['balanced']}
     },
