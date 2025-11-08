@@ -16,7 +16,7 @@ from xgboost import XGBClassifier
 from model_architecture import MLPipeline
 
 # Getting data
-df_90 = False
+df_90 = True
 if df_90:
        df = pd.read_csv('../data/90_day_mort.csv')
 else:

@@ -17,19 +17,24 @@ from model_architecture import MLPipeline
 
 # Getting data
 df_90 = True
-
 if df_90:
        df = pd.read_csv('../data/90_day_mort.csv')
 else:
        df = pd.read_csv('../data/30_day_mort.csv')
+       
 y = df.copy()['target']
 X = df.copy().drop(['target'], axis=1)
-X = X[['SIRI', 'Absolute Monocyte Count', 'Absolute Lymphocyte Count', 'Absolute Neutrophil Count']]
-xgb_weight = scale_pos_weight = len(y[y == 0]) / len(y[y == 1])
 
 # Organization
-names_cat_feats = []
-names_cont_feats = ['SIRI', 'Absolute Monocyte Count', 'Absolute Lymphocyte Count', 'Absolute Neutrophil Count']
+names_cat_feats = ['marital_status', 'race', 'gender']
+names_cont_feats = ['anchor_age',
+       'Absolute Basophil Count', 'Absolute Eosinophil Count',
+       'Absolute Lymphocyte Count', 'Absolute Monocyte Count',
+       'Absolute Neutrophil Count', 'Anion Gap', 'Base Excess', 'Bicarbonate',
+       'Creatinine', 'H', 'Hemoglobin',
+       'I', 'INR(PT)', 'Immature Granulocytes', 'L', 'Lactate', 'PTT',
+       'Platelet Count', 'RDW', 'Red Blood Cells', 'SIRI', 'Urea Nitrogen',
+       'pO2']
 
 
 # Parameter grid
@@ -56,14 +61,14 @@ models_and_params = {
     'SVC Poly': {'model': SVC(kernel='poly', random_state=random_state),
                  'params': {'model__C': np.logspace(-4, 3, 8),
                             'model__degree': [2, 3],                     
-                            'model__gamma': ['scale', 'auto', 1, 10, 100],
-                            'model__coef0': [1.0, 5.0, 10.0, 20.0, 50.0],      
-                            'model__class_weight': ['balanced']}
+                            'model__gamma': ['scale', 'auto', 1e-3, 1e-2, 1e-1],
+                            'model__coef0': [0.0, 0.1, 1.0, 10.0],      
+                            'model__class_weight': ['balanced', None]}
     },
     'XGB': {'model': XGBClassifier(learning_rate = 0.03, n_estimators = 1000, missing=np.nan, subsample=0.66, verbosity=1),
             'params': {'model__max_depth': [1, 3, 10, 30, 100],  # Depth of the tree
                        'model__colsample_bytree': [0.1, 0.25, 0.5, 0.75, 1.0],  # Fraction of features used for fitting trees
-                       'model__scale_pos_weight': [xgb_weight]}
+                       'model__scale_pos_weight': [8, 10, 12, 15]}
     },
     'MLP': {'model': MLPClassifier(random_state=random_state, max_iter=300, early_stopping=True, n_iter_no_change=10),
             'params': {'model__hidden_layer_sizes': [(64,), (128,), (128, 64), (256, 128)],
@@ -82,9 +87,9 @@ model_results = ml(model_list=model_list, models_and_params=models_and_params)
 
 import pickle
 if df_90:
-       with open('model_results_immune_90.pkl', 'wb') as f:
+       with open('model_results_all_90.pkl', 'wb') as f:
               pickle.dump(model_results, f)
 else:
-     with open('model_results_immune_30.pkl', 'wb') as f:
-              pickle.dump(model_results, f)
+     with open('model_results_all_30.pkl', 'wb') as f:
+              pickle.dump(model_results, f)  
 
