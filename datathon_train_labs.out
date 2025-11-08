@@ -1,0 +1,154 @@
+Sender: LSF System <lsfadmin@lg07c06>
+Subject: Job 211044763: <#BSUB -P acc_bedsore_images;#BSUB -q gpu;#BSUB -gpu num=1;#BSUB -R a100;#BSUB -R "span[hosts=1]";#BSUB -n 4;#BSUB -R "rusage[mem=16000]";#BSUB -W 12:00;#BSUB -o datathon_train_labs.out;#BSUB -e datathon_train_labs.err; set -euo pipefail; # Modules;ml purge;ml cuda/11.8.0;ml anaconda3/2024.06; # Conda activate (non-interactive safe);eval "$(conda shell.bash hook)";conda activate pressureulcerstudy; # Ensure CUDA runtime is visible for TF;export LD_LIBRARY_PATH="${CUDA_HOME}/lib64:${LD_LIBRARY_PATH:-}"; # Thread/env knobs;export OMP_NUM_THREADS=1;export MKL_NUM_THREADS=1;export NUMEXPR_NUM_THREADS=1;export TF_NUM_INTEROP_THREADS=1;export TF_NUM_INTRAOP_THREADS=1;export TF_CPP_MIN_LOG_LEVEL=1;export TF_FORCE_GPU_ALLOW_GROWTH=true;export PYTHONUNBUFFERED=1; # Train;python -u train_and_eval_labs.py> in cluster <chimera> Exited
+
+Job <#BSUB -P acc_bedsore_images;#BSUB -q gpu;#BSUB -gpu num=1;#BSUB -R a100;#BSUB -R "span[hosts=1]";#BSUB -n 4;#BSUB -R "rusage[mem=16000]";#BSUB -W 12:00;#BSUB -o datathon_train_labs.out;#BSUB -e datathon_train_labs.err; set -euo pipefail; # Modules;ml purge;ml cuda/11.8.0;ml anaconda3/2024.06; # Conda activate (non-interactive safe);eval "$(conda shell.bash hook)";conda activate pressureulcerstudy; # Ensure CUDA runtime is visible for TF;export LD_LIBRARY_PATH="${CUDA_HOME}/lib64:${LD_LIBRARY_PATH:-}"; # Thread/env knobs;export OMP_NUM_THREADS=1;export MKL_NUM_THREADS=1;export NUMEXPR_NUM_THREADS=1;export TF_NUM_INTEROP_THREADS=1;export TF_NUM_INTRAOP_THREADS=1;export TF_CPP_MIN_LOG_LEVEL=1;export TF_FORCE_GPU_ALLOW_GROWTH=true;export PYTHONUNBUFFERED=1; # Train;python -u train_and_eval_labs.py> was submitted from host <li04e01> by user <parikr12> in cluster <chimera> at Sat Nov  8 14:00:57 2025
+Job was executed on host(s) <4*lg07c06>, in queue <gpu>, as user <parikr12> in cluster <chimera> at Sat Nov  8 14:00:59 2025
+</hpc/users/parikr12> was used as the home directory.
+</sc/arion/projects/bedsore_images/Datathon/codedependency> was used as the working directory.
+Started at Sat Nov  8 14:00:59 2025
+Terminated at Sat Nov  8 14:01:04 2025
+Results reported at Sat Nov  8 14:01:04 2025
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+#BSUB -P acc_bedsore_images
+#BSUB -q gpu
+#BSUB -gpu num=1
+#BSUB -R a100
+#BSUB -R "span[hosts=1]"
+#BSUB -n 4
+#BSUB -R "rusage[mem=16000]"
+#BSUB -W 12:00
+#BSUB -o datathon_train_labs.out
+#BSUB -e datathon_train_labs.err
+
+set -euo pipefail
+
+# Modules
+ml purge
+ml cuda/11.8.0
+ml anaconda3/2024.06
+
+# Conda activate (non-interactive safe)
+eval "$(conda shell.bash hook)"
+conda activate pressureulcerstudy
+
+# Ensure CUDA runtime is visible for TF
+export LD_LIBRARY_PATH="${CUDA_HOME}/lib64:${LD_LIBRARY_PATH:-}"
+
+# Thread/env knobs
+export OMP_NUM_THREADS=1
+export MKL_NUM_THREADS=1
+export NUMEXPR_NUM_THREADS=1
+export TF_NUM_INTEROP_THREADS=1
+export TF_NUM_INTRAOP_THREADS=1
+export TF_CPP_MIN_LOG_LEVEL=1
+export TF_FORCE_GPU_ALLOW_GROWTH=true
+export PYTHONUNBUFFERED=1
+
+# Train
+python -u train_and_eval_labs.py
+------------------------------------------------------------
+
+Exited with exit code 2.
+
+Resource usage summary:
+
+    CPU time :                                   2.22 sec.
+    Max Memory :                                 28 MB
+    Average Memory :                             24.75 MB
+    Total Requested Memory :                     64000.00 MB
+    Delta Memory :                               63972.00 MB
+    Max Swap :                                   -
+    Max Processes :                              5
+    Max Threads :                                8
+    Run time :                                   5 sec.
+    Turnaround time :                            7 sec.
+
+The output (if any) follows:
+
+
+
+PS:
+
+Read file <datathon_train_labs.err> for stderr output of this job.
+
+Sender: LSF System <lsfadmin@lg07c06>
+Subject: Job 211044982: <#BSUB -P acc_bedsore_images;#BSUB -q gpu;#BSUB -gpu num=1;#BSUB -R a100;#BSUB -R "span[hosts=1]";#BSUB -n 4;#BSUB -R "rusage[mem=16000]";#BSUB -W 12:00;#BSUB -o datathon_train_labs.out;#BSUB -e datathon_train_labs.err; set -euo pipefail; # Modules;ml purge;ml cuda/11.8.0;ml anaconda3/2024.06; # Conda activate (non-interactive safe);eval "$(conda shell.bash hook)";conda activate pressureulcerstudy; # Ensure CUDA runtime is visible for TF;export LD_LIBRARY_PATH="${CUDA_HOME}/lib64:${LD_LIBRARY_PATH:-}"; # Thread/env knobs;export OMP_NUM_THREADS=1;export MKL_NUM_THREADS=1;export NUMEXPR_NUM_THREADS=1;export TF_NUM_INTEROP_THREADS=1;export TF_NUM_INTRAOP_THREADS=1;export TF_CPP_MIN_LOG_LEVEL=1;export TF_FORCE_GPU_ALLOW_GROWTH=true;export PYTHONUNBUFFERED=1; # Train;python -u train_and_eval_labs.py> in cluster <chimera> Exited
+
+Job <#BSUB -P acc_bedsore_images;#BSUB -q gpu;#BSUB -gpu num=1;#BSUB -R a100;#BSUB -R "span[hosts=1]";#BSUB -n 4;#BSUB -R "rusage[mem=16000]";#BSUB -W 12:00;#BSUB -o datathon_train_labs.out;#BSUB -e datathon_train_labs.err; set -euo pipefail; # Modules;ml purge;ml cuda/11.8.0;ml anaconda3/2024.06; # Conda activate (non-interactive safe);eval "$(conda shell.bash hook)";conda activate pressureulcerstudy; # Ensure CUDA runtime is visible for TF;export LD_LIBRARY_PATH="${CUDA_HOME}/lib64:${LD_LIBRARY_PATH:-}"; # Thread/env knobs;export OMP_NUM_THREADS=1;export MKL_NUM_THREADS=1;export NUMEXPR_NUM_THREADS=1;export TF_NUM_INTEROP_THREADS=1;export TF_NUM_INTRAOP_THREADS=1;export TF_CPP_MIN_LOG_LEVEL=1;export TF_FORCE_GPU_ALLOW_GROWTH=true;export PYTHONUNBUFFERED=1; # Train;python -u train_and_eval_labs.py> was submitted from host <li04e01> by user <parikr12> in cluster <chimera> at Sat Nov  8 14:03:58 2025
+Job was executed on host(s) <4*lg07c06>, in queue <gpu>, as user <parikr12> in cluster <chimera> at Sat Nov  8 14:04:04 2025
+</hpc/users/parikr12> was used as the home directory.
+</sc/arion/projects/bedsore_images/Datathon/codedependency> was used as the working directory.
+Started at Sat Nov  8 14:04:04 2025
+Terminated at Sat Nov  8 14:04:08 2025
+Results reported at Sat Nov  8 14:04:08 2025
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+#BSUB -P acc_bedsore_images
+#BSUB -q gpu
+#BSUB -gpu num=1
+#BSUB -R a100
+#BSUB -R "span[hosts=1]"
+#BSUB -n 4
+#BSUB -R "rusage[mem=16000]"
+#BSUB -W 12:00
+#BSUB -o datathon_train_labs.out
+#BSUB -e datathon_train_labs.err
+
+set -euo pipefail
+
+# Modules
+ml purge
+ml cuda/11.8.0
+ml anaconda3/2024.06
+
+# Conda activate (non-interactive safe)
+eval "$(conda shell.bash hook)"
+conda activate pressureulcerstudy
+
+# Ensure CUDA runtime is visible for TF
+export LD_LIBRARY_PATH="${CUDA_HOME}/lib64:${LD_LIBRARY_PATH:-}"
+
+# Thread/env knobs
+export OMP_NUM_THREADS=1
+export MKL_NUM_THREADS=1
+export NUMEXPR_NUM_THREADS=1
+export TF_NUM_INTEROP_THREADS=1
+export TF_NUM_INTRAOP_THREADS=1
+export TF_CPP_MIN_LOG_LEVEL=1
+export TF_FORCE_GPU_ALLOW_GROWTH=true
+export PYTHONUNBUFFERED=1
+
+# Train
+python -u train_and_eval_labs.py
+------------------------------------------------------------
+
+Exited with exit code 2.
+
+Resource usage summary:
+
+    CPU time :                                   2.11 sec.
+    Max Memory :                                 33 MB
+    Average Memory :                             28.50 MB
+    Total Requested Memory :                     64000.00 MB
+    Delta Memory :                               63967.00 MB
+    Max Swap :                                   -
+    Max Processes :                              5
+    Max Threads :                                8
+    Run time :                                   4 sec.
+    Turnaround time :                            10 sec.
+
+The output (if any) follows:
+
+
+
+PS:
+
+Read file <datathon_train_labs.err> for stderr output of this job.
+
