@@ -6,8 +6,8 @@
 #BSUB -n 4
 #BSUB -R "rusage[mem=16000]"
 #BSUB -W 12:00
-#BSUB -o datathon_train_immune.out
-#BSUB -e datathon_train_immune.err
+#BSUB -o datathon_train_labs.out
+#BSUB -e datathon_train_labs.err
 
 set -euo pipefail
 
@@ -34,4 +34,4 @@ export TF_FORCE_GPU_ALLOW_GROWTH=true
 export PYTHONUNBUFFERED=1
 
 # Train
-python -u train_and_eval_immune.py
+python -u train_and_eval_labs.py
