@@ -16,21 +16,17 @@ from xgboost import XGBClassifier
 from model_architecture import MLPipeline
 
 # Getting data
-df_90 = False
+df_90 = True
 if df_90:
        df = pd.read_csv('../data/90_day_mort.csv')
 else:
        df = pd.read_csv('../data/30_day_mort.csv')
 y = df.copy()['target']
 X = df.copy().drop(['target'], axis=1)
-X = X[['admission_type', 'admit_provider_id', 'admission_location',
-       'insurance', 'language', 'marital_status', 'race', 'gender', 'first_careunit', 
-       'last_careunit', 'SIRI', 'Absolute Monocyte Count', 'Absolute Lymphocyte Count', 'Absolute Neutrophil Count']]
+X = X[['SIRI', 'Absolute Monocyte Count', 'Absolute Lymphocyte Count', 'Absolute Neutrophil Count']]
 
 # Organization
-names_cat_feats = ['admission_type', 'admit_provider_id', 'admission_location',
-       'insurance', 'language', 'marital_status', 'race', 'gender', 'first_careunit', 
-       'last_careunit']
+names_cat_feats = []
 names_cont_feats = ['SIRI', 'Absolute Monocyte Count', 'Absolute Lymphocyte Count', 'Absolute Neutrophil Count']
 
 
