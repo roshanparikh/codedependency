@@ -26,7 +26,7 @@ y = df.copy()['target']
 X = df.copy().drop(['target'], axis=1)
 
 # Organization
-names_cat_feats = ['marital_status', 'race', 'gender']
+names_cat_feats = ['race', 'gender']
 names_cont_feats = ['anchor_age',
        'Absolute Basophil Count', 'Absolute Eosinophil Count',
        'Absolute Lymphocyte Count', 'Absolute Monocyte Count',
