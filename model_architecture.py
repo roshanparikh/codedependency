@@ -42,34 +42,6 @@ class MLPipeline:
             ('onehot', OneHotEncoder(handle_unknown='ignore', sparse_output=False))
         ])
 
-        # self.num_pipeline = Pipeline([
-        #     ('imputer', IterativeImputer(
-        #         estimator=RandomForestRegressor(
-        #             n_estimators=10,
-        #             max_depth=5,
-        #             random_state=42
-        #         ),
-        #         max_iter=50,
-        #         initial_strategy="median",
-        #         skip_complete=True,
-        #         tol=1e-5,
-        #         random_state=42
-        #     )),
-        #     ('scaler', StandardScaler())
-        # ])
-
-        # self.num_pipeline = Pipeline([
-        #     ('imputer', IterativeImputer(
-        #         estimator=BayesianRidge(),
-        #         max_iter=50,
-        #         initial_strategy="median",
-        #         skip_complete=True,
-        #         tol=1e-5,
-        #         random_state=42
-        #     )),
-        #     ('scaler', StandardScaler())
-        # ])
-
         self.num_pipeline = Pipeline([
             ('imputer', SimpleImputer(strategy='median')),
             ('scaler', StandardScaler() )
