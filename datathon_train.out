@@ -1,0 +1,229 @@
+Sender: LSF System <lsfadmin@lg07c01>
+Subject: Job 211662863: <#!/bin/bash; #BSUB -P acc_bedsore_images;#BSUB -q gpu;#BSUB -gpu num=1;#BSUB -R a100;#BSUB -R "span[hosts=1]";#BSUB -n 4;#BSUB -R "rusage[mem=16000]";#BSUB -W 12:00;#BSUB -o datathon_train.out;#BSUB -e datathon_train.err; set -euo pipefail; # Modules;ml purge;ml cuda/11.8.0;ml anaconda3/2024.06; # Conda activate (non-interactive safe);eval "$(conda shell.bash hook)";conda activate pressureulcerstudy; # Ensure CUDA runtime is visible for TF;export LD_LIBRARY_PATH="${CUDA_HOME}/lib64:${LD_LIBRARY_PATH:-}"; # Thread/env knobs;export OMP_NUM_THREADS=1;export MKL_NUM_THREADS=1;export NUMEXPR_NUM_THREADS=1;export TF_NUM_INTEROP_THREADS=1;export TF_NUM_INTRAOP_THREADS=1;export TF_CPP_MIN_LOG_LEVEL=1;export TF_FORCE_GPU_ALLOW_GROWTH=true;export PYTHONUNBUFFERED=1; # Train;python -u train_and_eval.py> in cluster <chimera> Done
+
+Job <#!/bin/bash; #BSUB -P acc_bedsore_images;#BSUB -q gpu;#BSUB -gpu num=1;#BSUB -R a100;#BSUB -R "span[hosts=1]";#BSUB -n 4;#BSUB -R "rusage[mem=16000]";#BSUB -W 12:00;#BSUB -o datathon_train.out;#BSUB -e datathon_train.err; set -euo pipefail; # Modules;ml purge;ml cuda/11.8.0;ml anaconda3/2024.06; # Conda activate (non-interactive safe);eval "$(conda shell.bash hook)";conda activate pressureulcerstudy; # Ensure CUDA runtime is visible for TF;export LD_LIBRARY_PATH="${CUDA_HOME}/lib64:${LD_LIBRARY_PATH:-}"; # Thread/env knobs;export OMP_NUM_THREADS=1;export MKL_NUM_THREADS=1;export NUMEXPR_NUM_THREADS=1;export TF_NUM_INTEROP_THREADS=1;export TF_NUM_INTRAOP_THREADS=1;export TF_CPP_MIN_LOG_LEVEL=1;export TF_FORCE_GPU_ALLOW_GROWTH=true;export PYTHONUNBUFFERED=1; # Train;python -u train_and_eval.py> was submitted from host <li04e04> by user <parikr12> in cluster <chimera> at Wed Nov 12 13:11:24 2025
+Job was executed on host(s) <4*lg07c01>, in queue <gpu>, as user <parikr12> in cluster <chimera> at Wed Nov 12 13:11:30 2025
+</hpc/users/parikr12> was used as the home directory.
+</sc/arion/projects/bedsore_images/Datathon/codedependency> was used as the working directory.
+Started at Wed Nov 12 13:11:30 2025
+Terminated at Wed Nov 12 13:57:49 2025
+Results reported at Wed Nov 12 13:57:49 2025
+
+Your job looked like:
+
+------------------------------------------------------------
+# LSBATCH: User input
+#!/bin/bash
+
+#BSUB -P acc_bedsore_images
+#BSUB -q gpu
+#BSUB -gpu num=1
+#BSUB -R a100
+#BSUB -R "span[hosts=1]"
+#BSUB -n 4
+#BSUB -R "rusage[mem=16000]"
+#BSUB -W 12:00
+#BSUB -o datathon_train.out
+#BSUB -e datathon_train.err
+
+set -euo pipefail
+
+# Modules
+ml purge
+ml cuda/11.8.0
+ml anaconda3/2024.06
+
+# Conda activate (non-interactive safe)
+eval "$(conda shell.bash hook)"
+conda activate pressureulcerstudy
+
+# Ensure CUDA runtime is visible for TF
+export LD_LIBRARY_PATH="${CUDA_HOME}/lib64:${LD_LIBRARY_PATH:-}"
+
+# Thread/env knobs
+export OMP_NUM_THREADS=1
+export MKL_NUM_THREADS=1
+export NUMEXPR_NUM_THREADS=1
+export TF_NUM_INTEROP_THREADS=1
+export TF_NUM_INTRAOP_THREADS=1
+export TF_CPP_MIN_LOG_LEVEL=1
+export TF_FORCE_GPU_ALLOW_GROWTH=true
+export PYTHONUNBUFFERED=1
+
+# Train
+python -u train_and_eval.py
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   9015.00 sec.
+    Max Memory :                                 853 MB
+    Average Memory :                             789.43 MB
+    Total Requested Memory :                     64000.00 MB
+    Delta Memory :                               63147.00 MB
+    Max Swap :                                   -
+    Max Processes :                              10
+    Max Threads :                                24
+    Run time :                                   2779 sec.
+    Turnaround time :                            2785 sec.
+
+The output (if any) follows:
+
+
+>>>Running XGBClassifier(base_score=None, booster=None, callbacks=None,
+              colsample_bylevel=None, colsample_bynode=None,
+              colsample_bytree=None, device=None, early_stopping_rounds=None,
+              enable_categorical=False, eval_metric=None, feature_types=None,
+              feature_weights=None, gamma=None, grow_policy=None,
+              importance_type=None, interaction_constraints=None,
+              learning_rate=0.03, max_bin=None, max_cat_threshold=None,
+              max_cat_to_onehot=None, max_delta_step=None, max_depth=None,
+              max_leaves=None, min_child_weight=None, missing=nan,
+              monotone_constraints=None, multi_strategy=None, n_estimators=1000,
+              n_jobs=None, num_parallel_tree=None, ...)
+Fitting 5 folds for each of 100 candidates, totalling 500 fits
+Grid fit complete
+Predictions made
+Making results
+Results for XGB:
+Accuracy: 0.7892
+Accuracy improvement over baseline: -7.53%
+F1 Score: 0.4533
+F1 improvement over baseline: 45333333333333.33%
+Recall: 0.5964912280701754
+Best parameters: {'model__colsample_bytree': 0.25, 'model__max_depth': 3, 'model__scale_pos_weight': 12}
+
+>>>Running KNeighborsClassifier()
+Fitting 5 folds for each of 44 candidates, totalling 220 fits
+Grid fit complete
+Predictions made
+Making results
+Results for KNN:
+Accuracy: 0.8380
+Accuracy improvement over baseline: -1.81%
+F1 Score: 0.3505
+F1 improvement over baseline: 35051546391752.57%
+Recall: 0.2982456140350877
+Best parameters: {'model__n_neighbors': 3, 'model__p': 1, 'model__weights': 'uniform'}
+
+>>>Running SVC(kernel='linear', random_state=42)
+Fitting 5 folds for each of 18 candidates, totalling 90 fits
+Grid fit complete
+Predictions made
+Making results
+Results for SVC Linear:
+Accuracy: 0.7301
+Accuracy improvement over baseline: -14.46%
+F1 Score: 0.4560
+F1 improvement over baseline: 45595854922279.80%
+Recall: 0.7719298245614035
+Best parameters: {'model__C': 0.1, 'model__class_weight': 'balanced'}
+
+>>>Running SVC(random_state=42)
+Fitting 5 folds for each of 18 candidates, totalling 90 fits
+Grid fit complete
+Predictions made
+Making results
+Results for SVC RBF:
+Accuracy: 0.7712
+Accuracy improvement over baseline: -9.64%
+F1 Score: 0.4734
+F1 improvement over baseline: 47337278106508.88%
+Recall: 0.7017543859649122
+Best parameters: {'model__C': 1.0, 'model__class_weight': 'balanced'}
+
+>>>Running SVC(kernel='poly', random_state=42)
+Fitting 5 folds for each of 640 candidates, totalling 3200 fits
+Grid fit complete
+Predictions made
+Making results
+Results for SVC Poly:
+Accuracy: 0.7326
+Accuracy improvement over baseline: -14.16%
+F1 Score: 0.4526
+F1 improvement over baseline: 45263157894736.84%
+Recall: 0.7543859649122807
+Best parameters: {'model__C': 10.0, 'model__class_weight': 'balanced', 'model__coef0': 1.0, 'model__degree': 2, 'model__gamma': 'auto'}
+
+>>>Running XGBClassifier(base_score=None, booster=None, callbacks=None,
+              colsample_bylevel=None, colsample_bynode=None,
+              colsample_bytree=None, device=None, early_stopping_rounds=None,
+              enable_categorical=False, eval_metric=None, feature_types=None,
+              feature_weights=None, gamma=None, grow_policy=None,
+              importance_type=None, interaction_constraints=None,
+              learning_rate=0.03, max_bin=None, max_cat_threshold=None,
+              max_cat_to_onehot=None, max_delta_step=None, max_depth=None,
+              max_leaves=None, min_child_weight=None, missing=nan,
+              monotone_constraints=None, multi_strategy=None, n_estimators=1000,
+              n_jobs=None, num_parallel_tree=None, ...)
+Fitting 5 folds for each of 100 candidates, totalling 500 fits
+Grid fit complete
+Predictions made
+Making results
+Results for XGB:
+Accuracy: 0.7841
+Accuracy improvement over baseline: -6.73%
+F1 Score: 0.5385
+F1 improvement over baseline: 53846153846153.84%
+Recall: 0.7903225806451613
+Best parameters: {'model__colsample_bytree': 0.1, 'model__max_depth': 3, 'model__scale_pos_weight': 15}
+
+>>>Running KNeighborsClassifier()
+Fitting 5 folds for each of 44 candidates, totalling 220 fits
+Grid fit complete
+Predictions made
+Making results
+Results for KNN:
+Accuracy: 0.8252
+Accuracy improvement over baseline: -1.83%
+F1 Score: 0.2766
+F1 improvement over baseline: 27659574468085.11%
+Recall: 0.20967741935483872
+Best parameters: {'model__n_neighbors': 3, 'model__p': 2, 'model__weights': 'uniform'}
+
+>>>Running SVC(kernel='linear', random_state=42)
+Fitting 5 folds for each of 18 candidates, totalling 90 fits
+Grid fit complete
+Predictions made
+Making results
+Results for SVC Linear:
+Accuracy: 0.7506
+Accuracy improvement over baseline: -10.70%
+F1 Score: 0.5174
+F1 improvement over baseline: 51741293532338.30%
+Recall: 0.8387096774193549
+Best parameters: {'model__C': 0.01, 'model__class_weight': 'balanced'}
+
+>>>Running SVC(random_state=42)
+Fitting 5 folds for each of 18 candidates, totalling 90 fits
+Grid fit complete
+Predictions made
+Making results
+Results for SVC RBF:
+Accuracy: 0.7943
+Accuracy improvement over baseline: -5.50%
+F1 Score: 0.5556
+F1 improvement over baseline: 55555555555555.55%
+Recall: 0.8064516129032258
+Best parameters: {'model__C': 1.0, 'model__class_weight': 'balanced'}
+
+>>>Running SVC(kernel='poly', random_state=42)
+Fitting 5 folds for each of 640 candidates, totalling 3200 fits
+Grid fit complete
+Predictions made
+Making results
+Results for SVC Poly:
+Accuracy: 0.7506
+Accuracy improvement over baseline: -10.70%
+F1 Score: 0.5222
+F1 improvement over baseline: 52216748768472.91%
+Recall: 0.8548387096774194
+Best parameters: {'model__C': 0.01, 'model__class_weight': 'balanced', 'model__coef0': 10.0, 'model__degree': 3, 'model__gamma': 'auto'}
+
+
+PS:
+
+Read file <datathon_train.err> for stderr output of this job.
+
