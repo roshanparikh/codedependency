@@ -1,1 +1,8 @@
-# datathon2025
+# Datathon 2025: Team Code Dependency
+Our project aims to better model predictors of mortality following ICU hospitalization for acute myocardial infarction. Data came from the MIMIC-IV database.
+
+## Repository Structure
+The `src` folder contains all relevant coding files. Data was organized and preprocessed in the `make_cohort.ipynb` and `preprocess.ipynb` files, respectively. Preprocessing conducted in `preprocess.ipynb` accounted for feature engineering and missing values, but a more robust preprocessing pipeline was applied as part of the grid search in `model_architecture.py`. The `eda.ipynb` contains minimal EDA, while most EDA occurred in the `preprocessing.ipynb` notebook. `model_architecture.py` contains the full pipeline by with which models were trained and evaluated; this file includes a preprocessing pipeline to accomodate for scikit-learn's grid search function. Multiple feature sets were trained, where the full feature set corresponds to the `train_and_eval.py` file, a labs subset of features corresponds to the `train_and_eval_labs.py` file, and an immune count subset of features corresponds to the `train_and_eval_immune.py` file. Results were saved as `.pkl` files. Each `.pkl` file contains a dictionary of the best trained model for each algorithm type (SVC, KNN, XGBoost), the metrics for these models, and both raw and preprocessed test sets that the models were evaluated against. The `results.ipynb` notebook displays the results for each experiment and graphs depicting feature importance for selected models. The `shap_analysis.ipynb` notebook contains SHAP analyses and graphs.
+
+The `figs` folder contains the figures utilized in our final written report.
+
