@@ -1,0 +1,16 @@
+,mortality
+Cardiac Vascular Intensive Care Unit (CVICU),-0.28901426743338815
+Coronary Care Unit (CCU),0.06898970573202047
+Intensive Care Unit (ICU),0.03964859998916113
+Medical Intensive Care Unit (MICU),0.12050434879358124
+Medical/Surgical Intensive Care Unit (MICU/SICU),0.1459752458502211
+Medicine,-0.009201418972352542
+Neuro Intermediate,-0.033522762322602095
+Neuro Stepdown,0.01204851844520389
+Neuro Surgical Intensive Care Unit (Neuro SICU),0.06551976024127476
+PACU,0.011852781773868181
+Surgery/Trauma,0.021021584089818822
+Surgery/Vascular/Intermediate,0.052682144456834064
+Surgical Intensive Care Unit (SICU),0.04237823038993305
+Trauma SICU (TSICU),0.019062756606624976
+mortality,1.0
